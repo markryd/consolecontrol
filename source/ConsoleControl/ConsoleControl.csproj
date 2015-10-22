@@ -55,7 +55,7 @@
     <DocumentationFile>bin\Release\ConsoleControl.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>ConsoleControl.snk</AssemblyOriginatorKeyFile>
@@ -117,13 +117,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ConsoleControl.snk" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ConsoleControlAPI\ConsoleControlAPI.csproj">
       <Project>{a4b8573f-ebfc-4140-b8aa-7c037919ef57}</Project>
       <Name>ConsoleControlAPI</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ConsoleControl.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

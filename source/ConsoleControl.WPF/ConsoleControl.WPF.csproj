@@ -35,7 +35,7 @@
     <DocumentationFile>bin\Release\ConsoleControl.WPF.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>ConsoleControl.snk</AssemblyOriginatorKeyFile>
