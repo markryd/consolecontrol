@@ -205,6 +205,10 @@ namespace ConsoleControl
             if (output.ContainsAlert())
                 return;
 
+            //special case for Sh.exe sending the command prompt twice
+            if (output.EndsWith("\u001b[0m\r\n$ \n"))
+                return;
+
             if (output.ContainsAnsiColor())
             {
                 var parts = Regex.Split(output, @"(?=\u001B\[)");
