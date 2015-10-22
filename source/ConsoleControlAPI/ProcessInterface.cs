@@ -119,10 +119,15 @@ namespace ConsoleControlAPI
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="arguments">The arguments.</param>
-        public void StartProcess(string fileName, string arguments)
+        /// <param name="workingDirectory">Working directory to start the process with.</param>
+        public void StartProcess(string fileName, string arguments, string workingDirectory = null)
         {
             //  Create the process start info.
             var processStartInfo = new ProcessStartInfo(fileName, arguments);
+            if (workingDirectory != null)
+            {
+                processStartInfo.WorkingDirectory = workingDirectory;
+            }
 
             //  Set the options.
             processStartInfo.UseShellExecute = false;

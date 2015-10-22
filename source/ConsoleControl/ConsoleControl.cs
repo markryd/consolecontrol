@@ -285,14 +285,14 @@ namespace ConsoleControl
             }));
         }
 
-        
 
         /// <summary>
         /// Runs a process.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="arguments">The arguments.</param>
-        public void StartProcess(string fileName, string arguments)
+        /// <param name="workingDirectory">Working directory to start the process with.</param>
+        public void StartProcess(string fileName, string arguments, string workingDirectory = null)
         {
             //  Are we showing diagnostics?
             if (ShowDiagnostics)
@@ -305,7 +305,7 @@ namespace ConsoleControl
             }
 
             //  Start the process.
-            processInterace.StartProcess(fileName, arguments);
+            processInterace.StartProcess(fileName, arguments, workingDirectory);
 
             //  If we enable input, make the control not read only.
             if (IsInputEnabled)
