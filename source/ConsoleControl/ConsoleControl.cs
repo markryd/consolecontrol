@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ConsoleControlAPI;
 
@@ -200,13 +202,46 @@ namespace ConsoleControl
             if (!this.IsHandleCreated)
                 return;
 
-            Invoke((Action)(() =>
+            if (output.ContainsAlert())
+                return;
+
+            if (output.ContainsAnsiColor())
             {
-                //  Write the output.
-                richTextBoxConsole.SelectionColor = color;
-                richTextBoxConsole.SelectedText += output;
-                inputStart = richTextBoxConsole.SelectionStart;
-            }));
+                var parts = Regex.Split(output, @"(?=\u001B\[)");
+                Invoke((Action) (() =>
+                {
+                    foreach (var part in parts)
+                    {
+                        if (part.StartsWithColorReset())
+                        {
+                            DoWrite(part.SafeSubstring(4), Color.White);
+                            continue;
+                        }
+                        
+                        var colorKey = part.SafeSubstring(0, 5);
+                        Color ansiColor;
+                        if (_map.TryGetValue(colorKey, out ansiColor))
+                        {
+                            DoWrite(part.SafeSubstring(5), ansiColor);
+                        }
+                        else
+                        {
+                            DoWrite(part, color);
+                        }
+                    }
+                }));
+            }
+            else
+            {
+                Invoke((Action) (() => { DoWrite(output, color); }));
+            }
+        }
+
+        private void DoWrite(string output, Color color)
+        {
+            richTextBoxConsole.SelectionColor = color;
+            richTextBoxConsole.SelectedText += output;
+            inputStart = richTextBoxConsole.SelectionStart;
         }
 
         /// <summary>
@@ -474,10 +509,69 @@ namespace ConsoleControl
                 richTextBoxConsole.BackColor = value;
             }
         }
+
+        private readonly Dictionary<string, Color> _map = new Dictionary<string, Color>
+        {
+            {"\u001B[30m", Color.Black},
+            {"\u001B[31m", Color.Red},
+            {"\u001B[32m", Color.Green},
+            {"\u001B[33m", Color.Yellow},
+            {"\u001B[34m", Color.Blue},
+            {"\u001B[35m", Color.Magenta},
+            {"\u001B[36m", Color.Cyan},
+            {"\u001B[37m", Color.White},
+        };
     }
 
     /// <summary>
     /// Used to allow us to find resources properly.
     /// </summary>
     public class Resfinder {}
+
+    public static class StringExtensions
+    {
+        public static bool ContainsAnsiColor(this string input)
+        {
+            return input.Contains(AnsiColorPrefix);
+        }
+
+        private const string AnsiColorPrefix = "\u001B[";
+
+        public static bool ContainsAlert(this string input)
+        {
+            return input.Contains("\a");
+        }
+
+        public static bool StartsWithColorReset(this string input)
+        {
+            return input.StartsWith(AnsiResetColor);
+        }
+
+        private const string AnsiResetColor = "\u001B[0m";
+
+        public static string SafeSubstring(this string input, int startIndex, int length)
+        {
+            if (input.Length >= (startIndex + length))
+            {
+                return input.Substring(startIndex, length);
+            }
+
+            if (input.Length > startIndex)
+            {
+                return input.Substring(startIndex);
+            }
+
+            return string.Empty;
+        }
+
+        public static string SafeSubstring(this string input, int startIndex)
+        {
+            if (input.Length > startIndex)
+            {
+                return input.Substring(startIndex);
+            }
+
+            return string.Empty;
+        }
+    }
 }
